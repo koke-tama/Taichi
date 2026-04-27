@@ -1,5 +1,5 @@
 package scoremanager.main;
- 
+
 import java.util.Enumeration;
 
 import bean.Student;
@@ -11,74 +11,94 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import tool.Action;
- 
+
 public class TestRegistExecuteAction extends Action {
- 
+
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
- 
+
         HttpSession session = request.getSession();
         Teacher teacher = (Teacher) session.getAttribute("user");
- 
+
         if (teacher == null) {
             response.sendRedirect("login.jsp");
             return;
         }
- 
-        // 検索条件の取得
+
+        // パラメータ取得
         String subjectCd = request.getParameter("subjectCd");
         String countStr = request.getParameter("count");
-        int count = Integer.parseInt(countStr);
- 
+        String classNum = request.getParameter("classNum");
+
+        // 入力チェック
+        if (subjectCd == null || subjectCd.isEmpty()
+                || countStr == null || countStr.isEmpty()
+                || classNum == null || classNum.isEmpty()) {
+
+            request.setAttribute("errors", "必要な項目が未入力です");
+            request.getRequestDispatcher("TestRegist.action").forward(request, response);
+            return;
+        }
+
+        int count;
+        try {
+            count = Integer.parseInt(countStr);
+        } catch (NumberFormatException e) {
+            request.setAttribute("errors", "回数が不正です");
+            request.getRequestDispatcher("TestRegist.action").forward(request, response);
+            return;
+        }
+
         TestDao dao = new TestDao();
         Enumeration<String> params = request.getParameterNames();
- 
-        // バリデーションチェック（0〜100点か確認）
-        while (params.hasMoreElements()) {
-            String paramName = params.nextElement();
-            if (paramName.startsWith("point_")) {
-                String pointStr = request.getParameter(paramName);
-                if (pointStr != null && !pointStr.isEmpty()) {
-                    int point = Integer.parseInt(pointStr);
-                    if (point < 0 || point > 100) {
-                        // 範囲外ならエラーメッセージをセットして入力画面に戻る
-                        request.setAttribute("errors", "0〜100の範囲で入力してください");
-                        request.getRequestDispatcher("TestRegist.action").forward(request, response);
-                        return;
-                    }
-                }
-            }
-        }
- 
+
         // 保存処理
-        params = request.getParameterNames(); // ポインタをリセット
         while (params.hasMoreElements()) {
             String paramName = params.nextElement();
- 
+
             if (paramName.startsWith("point_")) {
                 String studentNo = paramName.substring(6);
                 String pointStr = request.getParameter(paramName);
- 
+
                 if (pointStr == null || pointStr.isEmpty()) continue;
- 
+
+                int point;
+                try {
+                    point = Integer.parseInt(pointStr);
+                } catch (NumberFormatException e) {
+                    request.setAttribute("errors", "点数は数値で入力してください");
+                    request.getRequestDispatcher("TestRegist.action").forward(request, response);
+                    return;
+                }
+
+                if (point < 0 || point > 100) {
+                    request.setAttribute("errors", "点数は0〜100で入力してください");
+                    request.getRequestDispatcher("TestRegist.action").forward(request, response);
+                    return;
+                }
+
                 Test test = new Test();
+
+                // 学生
                 Student student = new Student();
                 student.setNo(studentNo);
                 test.setStudent(student);
- 
+
+                // 科目
                 Subject subject = new Subject();
-                subject.setCd(subjectCd != null ? subjectCd.trim() : "");
+                subject.setCd(subjectCd.trim());
                 test.setSubject(subject);
- 
+
+                // 回数・点数・クラス
                 test.setNo(count);
-                test.setPoint(Integer.parseInt(pointStr));
- 
+                test.setPoint(point);
+                test.setClassNum(classNum);
+
+                // 保存
                 dao.save(test, teacher.getSchool());
             }
         }
- 
-        // 直接完了画面のJSPを表示（画像通りのレイアウトにするため）
+
         request.getRequestDispatcher("test_regist_done.jsp").forward(request, response);
     }
 }
- 

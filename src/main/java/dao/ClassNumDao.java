@@ -12,185 +12,57 @@ import bean.School;
 public class ClassNumDao extends Dao {
 
     /**
-
-     * 指定したクラス番号と学校に紐づく情報を取得します
-
+     * 【TestListActionから呼び出し】
+     * ユーザーが所属している学校(School)のクラスデータを文字列のリストで取得します。
+     * ドロップダウンリストなどの表示用に使用します。
      */
-
-    public ClassNum get(String class_num, School school) throws Exception {
-
-        ClassNum classNum = null;
-
-        String sql = "select * from class_num where class_num = ? and school_cd = ?";
-
-        // try-with-resources文を使用（自動でcloseされるためfinallyが不要になります）
-
-        try (Connection connection = getConnection();
-
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-
-            statement.setString(1, class_num);
-
-            statement.setString(2, school.getCd());
-
-            try (ResultSet rSet = statement.executeQuery()) {
-
-                SchoolDao sDao = new SchoolDao();
-
-                if (rSet.next()) {
-
-                    classNum = new ClassNum();
-
-                    classNum.setClass_num(rSet.getString("class_num"));
-
-                    classNum.setSchool(sDao.get(rSet.getString("school_cd")));
-
-                }
-
-            }
-
-        } catch (Exception e) {
-
-            throw e;
-
-        }
-
-        return classNum;
-
-    }
-
-    /**
-
-     * 学校に紐づくすべてのクラス番号を取得します
-
-     */
-
     public List<String> filter(School school) throws Exception {
-
         List<String> list = new ArrayList<>();
+        // 学校コード(school_cd)に合致するクラス番号を取得するSQL
+        String sql = "SELECT class_num FROM class_num WHERE school_cd = ? ORDER BY class_num ASC";
 
-        String sql = "select class_num from class_num where school_cd=? order by class_num";
-
-        try (Connection connection = getConnection();
-
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-
+        try (Connection con = getConnection();
+             PreparedStatement statement = con.prepareStatement(sql)) {
+            
+            // 引数で渡されたSchoolオブジェクトからコードをセット
             statement.setString(1, school.getCd());
 
             try (ResultSet rSet = statement.executeQuery()) {
-
                 while (rSet.next()) {
-
+                    // クラス番号（文字列）をリストに追加
                     list.add(rSet.getString("class_num"));
-
                 }
-
             }
-
         } catch (Exception e) {
-
             throw e;
-
         }
-
         return list;
-
     }
 
     /**
-
-     * クラス番号を新規登録（または上書き）します
-
+     * クラス番号と学校から、ClassNum Bean形式でデータを取得します。
+     * 特定の一致データが必要な場合に使用します。
      */
+    public ClassNum get(String classNumStr, School school) throws Exception {
+        ClassNum classNum = null;
+        String sql = "SELECT * FROM class_num WHERE class_num = ? AND school_cd = ?";
 
-    public boolean save(ClassNum classNum) throws Exception {
+        try (Connection con = getConnection();
+             PreparedStatement statement = con.prepareStatement(sql)) {
+            
+            statement.setString(1, classNumStr);
+            statement.setString(2, school.getCd());
 
-        int count = 0;
-
-        // 既存チェック
-
-        ClassNum old = get(classNum.getClass_num(), classNum.getSchool());
-
-        try (Connection connection = getConnection()) {
-
-            PreparedStatement statement = null;
-
-            if (old == null) {
-
-                // 新規登録
-
-                statement = connection.prepareStatement(
-
-                    "insert into class_num (class_num, school_cd) values (?, ?)");
-
-                statement.setString(1, classNum.getClass_num());
-
-                statement.setString(2, classNum.getSchool().getCd());
-
-            } else {
-
-                // 既存更新（実質同じ値での上書き）
-
-                statement = connection.prepareStatement(
-
-                    "update class_num set class_num=? where class_num=? and school_cd=?");
-
-                statement.setString(1, classNum.getClass_num());
-
-                statement.setString(2, classNum.getClass_num());
-
-                statement.setString(3, classNum.getSchool().getCd());
-
+            try (ResultSet rSet = statement.executeQuery()) {
+                if (rSet.next()) {
+                    classNum = new ClassNum();
+                    classNum.setClassNum(rSet.getString("class_num"));
+                    classNum.setSchool(school);
+                }
             }
-
-            count = statement.executeUpdate();
-
-            statement.close();
-
         } catch (Exception e) {
-
             throw e;
-
         }
-
-        return count > 0;
-
+        return classNum;
     }
-
-    /**
-
-     * クラス番号を変更します
-
-     */
-
-    public boolean save(ClassNum classNum, String newClassNum) throws Exception {
-
-        int count = 0;
-
-        String sql = "update class_num set class_num=? where class_num=? and school_cd=?";
-
-        try (Connection connection = getConnection();
-
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-
-            statement.setString(1, newClassNum);        // 新しい番号
-
-            statement.setString(2, classNum.getClass_num()); // 以前の番号
-
-            statement.setString(3, classNum.getSchool().getCd());
-
-            count = statement.executeUpdate();
-
-        } catch (Exception e) {
-
-            throw e;
-
-        }
-
-        return count > 0;
-
-    }
-
 }
-
- 

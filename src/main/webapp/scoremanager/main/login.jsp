@@ -19,7 +19,7 @@ function togglePassword() {
     <h2 class="h5 text-center p-2 mb-0 bg-light border border-bottom-0" style="color: #333;">ログイン</h2>
  
     <div class="border p-4 bg-white">
- 
+
         <c:if test="${not empty error}">
             <p class="mb-3" style="font-size: 0.85rem; color: #000;">
                 ${error}

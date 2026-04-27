@@ -10,7 +10,7 @@
                 科目情報変更
             </h2>
 
-            <%-- エラーメッセージの表示（Actionから渡された場合） --%>
+            <%-- Actionから渡されたエラーメッセージ（重複チェックエラーなど）の表示 --%>
             <c:if test="${not empty errors}">
                 <div class="alert alert-danger">
                     <c:forEach var="error" items="${errors}">
@@ -19,29 +19,29 @@
                 </div>
             </c:if>
 
-            <%-- 変更フォーム：送信先は SubjectUpdateExecute.action --%>
             <form action="SubjectUpdateExecute.action" method="post">
-                <div class="mb-3">
-                    <label class="form-label">科目コード</label>
-                    <%-- 科目コードは主キーのため変更不可（読み取り専用）として表示することが一般的です --%>
-                    <input type="text" class="form-control-plaintext" name="cd" value="${subject.cd}" readonly>
-                </div>
+                <%-- 【重要】変更前の科目コードを保持して、SQLのWHERE句で利用する --%>
+                <input type="hidden" name="oldCd" value="${subject.cd}">
 
                 <div class="mb-3">
-                    <label class="form-label">科目名</label>
-                    <%-- required: 未入力時に「このフィールドを入力してください」を表示 --%>
-                    <input type="text" class="form-control" name="name" value="${subject.name}" 
-                           required 
-                           placeholder="科目名を入力してください">
-                </div>
+    <label class="form-label">科目コード</label>
+    <%-- readonly を付与し、枠線を消してテキスト表示にします --%>
+    <input type="text" class="form-control-plaintext" name="cd" value="${subject.cd}" readonly>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">科目名</label>
+    <%-- 科目名だけを変更可能にします --%>
+    <input type="text" class="form-control" name="name" value="${subject.name}" 
+           required placeholder="科目名を入力してください">
+</div>
 
                 <div class="mt-4">
-                    <%-- 変更ボタン --%>
                     <button type="submit" class="btn btn-primary">変更</button>
                 </div>
             </form>
 
-            <%-- 戻るボタン：メニューと同じ処理（SubjectList.action）を経由させる --%>
+            <%-- 戻るボタン：SubjectList.action を経由して一覧へ --%>
             <div class="mt-4">
                 <a href="${pageContext.request.contextPath}/scoremanager/main/SubjectList.action"
                    class="text-primary text-decoration-underline">
