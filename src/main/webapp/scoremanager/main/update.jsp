@@ -1,3 +1,4 @@
+<%-- 長家優紀 --%>
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
  
@@ -11,62 +12,57 @@
  
 <form action="StudentUpdateExecute.action" method="post">
  
-    <!-- 入学年度 -->
-    <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label">入学年度</label><br>
-        <div class="col-sm-7">
-            <input type="number" name="ent_year"
-                   value="${student.entYear}"
-                   class="form-control">
-        </div>
+ <!-- 入学年度 -->
+<div class="mb-3">
+    <label class="fw-bold">入学年度</label>
+    <div class="ms-3 pt-1">
+        ${student.entYear}
+        <input type="hidden" name="ent_year" value="${student.entYear}">
     </div>
- 
-    <!-- 学生番号 -->
-    <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label">学生番号</label><br>
-        <div class="col-sm-9 pt-2">
-            ${student.no}
-            <input type="hidden" name="no" value="${student.no}">
-            <input type="hidden" name="school_cd" value="${student.school.cd}">
-        </div>
+</div>
+
+<!-- 学生番号 -->
+<div class="mb-3">
+    <label class="fw-bold">学生番号</label>
+    <div class="ms-3 pt-1">
+        ${student.no}
+        <input type="hidden" name="no" value="${student.no}">
+        <input type="hidden" name="school_cd" value="${student.school.cd}">
     </div>
- 
-    <!-- 氏名 -->
-    <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label">氏名</label><br>
-        <div class="col-sm-9">
-            <input type="text" name="name"
-                   value="${student.name}"
-                   class="form-control">
-        </div>
+</div>
+
+<!-- 氏名 -->
+<div class="mb-3">
+    <label class="fw-bold">氏名</label>
+    <div class="ms-3 pt-1">
+        <input type="text" name="name" value="${student.name}" class="form-control">
     </div>
- 
-    <!-- クラス -->
-    <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label">クラス</label><br>
-        <div class="col-sm-9">
-            <select name="class_num" class="form-select">
-                <c:forEach var="cls" items="${class_list}">
-                    <option value="${cls}"
-                        <c:if test="${cls == student.classNum}">selected</c:if>>
-                        ${cls}
-                    </option>
-                </c:forEach>
-            </select>
-        </div>
+</div>
+
+<!-- クラス -->
+<div class="mb-3">
+    <label class="fw-bold">クラス</label>
+    <div class="ms-3 pt-1">
+        <select name="class_num" class="form-select">
+            <c:forEach var="cls" items="${class_list}">
+                <option value="${cls}" <c:if test="${cls == student.classNum}">selected</c:if>>
+                    ${cls}
+                </option>
+            </c:forEach>
+        </select>
     </div>
- 
-    <!-- 在学中 -->
-    <div class="mb-3 row">
-    <label class="col-sm-3 col-form-label">在学中</label>
- 
-    <div class="col-sm-9 d-flex align-items-center">
-        <input type="checkbox" name="is_attend" class="me-2"
+</div>
+
+<!-- 在学中 -->
+<div class="mb-3">
+    <label class="fw-bold">在学中</label>
+    <div class="ms-3 pt-1">
+        <input type="checkbox" name="is_attend" class="form-check-input"
             <c:if test="${student.attend}">checked</c:if>>
     </div>
 </div>
     <!-- ボタン -->
-    <div class="text-center mt-3">
+    <div class="mt-3">
     <button type="submit" class="btn btn-primary px-3">
         変更
     </button><br>

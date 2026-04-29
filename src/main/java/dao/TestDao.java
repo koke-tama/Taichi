@@ -1,3 +1,4 @@
+/*高野翔*/
 package dao;
 
 import java.sql.Connection;
@@ -14,18 +15,14 @@ import bean.Test;
 public class TestDao extends Dao {
 
     /**
-     * 【TestListStudentExecuteActionで使用】
-     * 特定の学生にマッチする成績データをすべて取得します。
-     * 科目名を表示するために subject テーブルと結合します。
-     * 
-     * @param student 学生Bean
-     * @return 成績Beanのリスト
+     * 学生別の成績一覧を取得する
+     * @param student 学生
+     * @return 成績リスト
      * @throws Exception
      */
     public List<Test> filter(Student student) throws Exception {
         List<Test> list = new ArrayList<>();
 
-        // 学生番号にマッチする成績と、その科目情報を取得するSQL
         String sql = """
             SELECT 
                 t.subject_cd, 
@@ -43,41 +40,41 @@ public class TestDao extends Dao {
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            // 引数の学生オブジェクトから学生番号をセット
             ps.setString(1, student.getNo());
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Test test = new Test();
-                    
-                    // 学生情報をセット
+
                     test.setStudent(student);
 
-                    // 科目情報をセット（科目名を取得してセット）
                     Subject subject = new Subject();
                     subject.setCd(rs.getString("subject_cd"));
                     subject.setName(rs.getString("subject_name"));
                     test.setSubject(subject);
 
-                    // テスト情報（回数・点数）をセット
                     test.setNo(rs.getInt("test_no"));
                     test.setPoint(rs.getInt("point"));
 
                     list.add(test);
                 }
             }
-        } catch (Exception e) {
-            throw e;
         }
-
         return list;
     }
 
     /**
-     * 【成績参照：科目・クラス毎】（既存）
+     * 科目・クラス別の成績一覧を取得する
+     * @param entYear 入学年度
+     * @param classNum クラス番号
+     * @param subject 科目
+     * @param school 学校
+     * @return 成績リスト
+     * @throws Exception
      */
     public List<Test> filter(int entYear, String classNum, Subject subject, School school) throws Exception {
         List<Test> list = new ArrayList<>();
+
         String sql = """
             SELECT 
                 t.student_no, 
@@ -97,6 +94,7 @@ public class TestDao extends Dao {
 
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setString(1, school.getCd());
             ps.setInt(2, entYear);
             ps.setString(3, classNum);
@@ -105,32 +103,38 @@ public class TestDao extends Dao {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Test test = new Test();
+
                     Student student = new Student();
                     student.setNo(rs.getString("student_no"));
                     student.setName(rs.getString("student_name"));
                     student.setEntYear(rs.getInt("ent_year"));
                     student.setClassNum(rs.getString("class_num"));
+
                     test.setStudent(student);
                     test.setSubject(subject);
                     test.setNo(rs.getInt("test_no"));
                     test.setPoint(rs.getInt("point"));
+
                     list.add(test);
                 }
             }
-        } catch (Exception e) {
-            throw e;
         }
         return list;
     }
+
     /**
-     * 【成績登録用】
-     * 学校、入学年度、クラス、科目コード、回数に合致する成績リストを取得します。
-     * 引数の型と順番をアクション側の呼び出し (School, int, String, String, int) に合わせています。
+     * 成績登録画面用のデータを取得する（未登録も含む）
+     * @param school 学校
+     * @param entYear 入学年度
+     * @param classNum クラス
+     * @param subjectCd 科目コード
+     * @param no 回数
+     * @return 成績リスト
+     * @throws Exception
      */
     public List<Test> filter(School school, int entYear, String classNum, String subjectCd, int no) throws Exception {
         List<Test> list = new ArrayList<>();
 
-        // 学生を主軸に、その学生の特定の科目の成績を外部結合(LEFT JOIN)で取得
         String sql = """
             SELECT 
                 s.no AS student_no, 
@@ -152,49 +156,44 @@ public class TestDao extends Dao {
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            // SQLの「?」に値をセット（引数の順番に注意）
-            ps.setString(1, subjectCd);    // t.subject_cd
-            ps.setInt(2, no);              // t.no
-            ps.setString(3, school.getCd()); // t.school_cd
-            ps.setString(4, school.getCd()); // s.school_cd
-            ps.setInt(5, entYear);         // s.ent_year
-            ps.setString(6, classNum);      // s.class_num
+            ps.setString(1, subjectCd);
+            ps.setInt(2, no);
+            ps.setString(3, school.getCd());
+            ps.setString(4, school.getCd());
+            ps.setInt(5, entYear);
+            ps.setString(6, classNum);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Test test = new Test();
-                    
-                    // 学生情報をセット
+
                     Student student = new Student();
                     student.setNo(rs.getString("student_no"));
                     student.setName(rs.getString("student_name"));
                     student.setEntYear(rs.getInt("ent_year"));
                     student.setClassNum(rs.getString("class_num"));
-                    test.setStudent(student);
 
-                    // テスト情報をセット
+                    test.setStudent(student);
                     test.setNo(no);
-                    // ポイントを取得（レコードがない場合は rs.getInt は 0 を返しますが、
-                    // 必要に応じて rs.wasNull() で未入力判定も可能です）
                     test.setPoint(rs.getInt("point"));
 
                     list.add(test);
                 }
             }
-        } catch (Exception e) {
-            throw e;
         }
-
         return list;
     }
+
     /**
-     * 成績データの保存（MERGE）（既存）
+     * 成績データを登録または更新する
+     * @param test 成績
+     * @param school 学校
+     * @throws Exception
      */
     public void save(Test test, School school) throws Exception {
 
         Connection con = getConnection();
 
-        // 既存データ確認
         PreparedStatement checkSt = con.prepareStatement(
             "SELECT COUNT(*) FROM TEST WHERE student_no=? AND subject_cd=? AND no=? AND school_cd=?"
         );
@@ -206,10 +205,8 @@ public class TestDao extends Dao {
 
         ResultSet rs = checkSt.executeQuery();
         rs.next();
-        int count = rs.getInt(1);
 
-        if (count > 0) {
-            // --- UPDATE ---
+        if (rs.getInt(1) > 0) {
             PreparedStatement st = con.prepareStatement(
                 "UPDATE TEST SET point=?, class_num=? WHERE student_no=? AND subject_cd=? AND no=? AND school_cd=?"
             );
@@ -222,11 +219,9 @@ public class TestDao extends Dao {
             st.setString(6, school.getCd());
 
             st.executeUpdate();
-
             st.close();
 
         } else {
-            // --- INSERT ---
             PreparedStatement st = con.prepareStatement(
                 "INSERT INTO TEST (student_no, subject_cd, no, point, class_num, school_cd) VALUES (?, ?, ?, ?, ?, ?)"
             );
@@ -239,7 +234,6 @@ public class TestDao extends Dao {
             st.setString(6, school.getCd());
 
             st.executeUpdate();
-
             st.close();
         }
 

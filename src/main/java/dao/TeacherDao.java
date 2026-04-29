@@ -1,5 +1,6 @@
+/*長家優紀*/
 package dao;
- 
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,15 +10,18 @@ import bean.Teacher;
  
 public class TeacherDao extends Dao {
  
-    // IDで教員1件取得
+    /**
+     * 教員IDをもとに教員情報を1件取得する
+     * @param id 教員ID
+     * @return Teacherオブジェクト（存在しない場合はnull）
+     * @throws Exception
+     */
     public Teacher get(String id) throws Exception {
  
         Teacher teacher = null;
- 
         Connection con = getConnection();
  
         String sql = "SELECT * FROM teacher WHERE id = ?";
- 
         PreparedStatement st = con.prepareStatement(sql);
         st.setString(1, id);
  
@@ -25,12 +29,11 @@ public class TeacherDao extends Dao {
  
         if (rs.next()) {
             teacher = new Teacher();
- 
             teacher.setId(rs.getString("id"));
             teacher.setPassword(rs.getString("password"));
             teacher.setName(rs.getString("name"));
  
-            // 学校情報
+            // 学校情報を設定
             School school = new School();
             school.setCd(rs.getString("school_cd"));
             teacher.setSchool(school);
@@ -42,4 +45,3 @@ public class TeacherDao extends Dao {
         return teacher;
     }
 }
- 

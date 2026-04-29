@@ -1,3 +1,4 @@
+<%-- 河合太一 --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
@@ -6,17 +7,21 @@
 
     <c:param name="content">
         <section class="me-4">
+
+            <%-- 見出し --%>
             <h2 class="h3 mb-3 fw-bold bg-secondary bg-opacity-10 py-2 px-4">
                 科目登録
             </h2>
 
+            <%-- 完了メッセージ --%>
             <p class="mb-3 fw-normal bg-success bg-opacity-10 py-2 px-4 border border-success rounded text-center">
                 登録が完了しました。
             </p>
 
-            <%-- 余白調整 --%>
+            <%-- 余白 --%>
             <br><br><br><br>
 
+            <%-- リンク --%>
             <div class="d-flex justify-content-between mt-4 px-3">
                 <a href="${pageContext.request.contextPath}/scoremanager/main/SubjectCreate.action"
                    class="text-primary text-decoration-underline">
@@ -28,6 +33,7 @@
                     科目一覧
                 </a>
             </div>
+
         </section>
     </c:param>
 </c:import>

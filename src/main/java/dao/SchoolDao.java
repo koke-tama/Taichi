@@ -1,66 +1,33 @@
+/*小野田匠希*/
 package dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import bean.School;
 
+/** 学校データアクセスクラス */
 public class SchoolDao extends Dao {
-    /**
-     * getメソッド 学校コードを指定して学校インスタンスを1件取得する
-     * * @param cd:String
-     * 学校コード
-     * @return 学校クラスのインスタンス 存在しない場合はnull
-     * @throws Exception
-     */
+
+    /** 学校コードで1件取得 */
     public School get(String cd) throws Exception {
-        // 学校インスタンスを初期化
-        School school = new School();
-        // データベースへのコネクションを確率
-        Connection connection = getConnection();
-        // プリペアードステートメント
-        PreparedStatement statement = null;
+        School school = null;
+        String sql = "SELECT * FROM school WHERE cd = ?";
 
-        try {
-            // プリペアードステートメントにSQL文をセット
-            statement = connection.prepareStatement("select * from school where cd = ?");
-            // プリペアードステートメントに学校コードをバインド
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
             statement.setString(1, cd);
-            // プリペアードステートメントを実行
-            ResultSet rSet = statement.executeQuery();
 
-            if (rSet.next()) {
-                // リザルトセットが存在する場合
-                // 学校インスタンスに学校コードと学校名をセット
-                school.setCd(rSet.getString("cd"));
-                school.setName(rSet.getString("name"));
-            } else {
-                // 存在しない場合
-                // 学校インスタンスにnullをセット
-                school = null;
-            } 
-        }catch (Exception e) {
-                throw e;
-            } finally {
-                // プリペアードステートメントを閉じる
-                if (statement != null) {
-                    try {
-                        statement.close();
-                    } catch (SQLException sqle) {
-                        throw sqle;
-                    }
-                }
-                // コネクションを閉じる
-                if (connection != null) {
-                    try {
-                        connection.close();
-                    } catch (SQLException sqle) {
-                        throw sqle;
-                    }
+            try (ResultSet rSet = statement.executeQuery()) {
+                if (rSet.next()) {
+                    school = new School();
+                    school.setCd(rSet.getString("cd"));
+                    school.setName(rSet.getString("name"));
                 }
             }
-            return school;
         }
+        return school;
     }
+}

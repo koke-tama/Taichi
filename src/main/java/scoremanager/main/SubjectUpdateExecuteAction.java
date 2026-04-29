@@ -1,3 +1,4 @@
+/** 河合太一 */
 package scoremanager.main;
 
 import java.util.ArrayList;
@@ -18,12 +19,10 @@ public class SubjectUpdateExecuteAction extends Action {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
 
-        // 1. パラメータの取得
-        String oldCd = request.getParameter("oldCd"); // ★隠しパラメータ（元のコード）
-        String cd = request.getParameter("cd");       // 新しいコード
-        String name = request.getParameter("name");   // 新しい名前
+        String oldCd = request.getParameter("oldCd");
+        String cd = request.getParameter("cd");
+        String name = request.getParameter("name");
 
-        // 2. 更新用データのセット
         Subject subject = new Subject();
         subject.setCd(cd);
         subject.setName(name);
@@ -31,15 +30,11 @@ public class SubjectUpdateExecuteAction extends Action {
 
         SubjectDao sDao = new SubjectDao();
 
-        // 3. 更新処理の実行
-        // ★ save ではなく、oldCdを引数に持つ update メソッドを呼び出す
         boolean isSuccess = sDao.update(subject, oldCd);
 
         if (isSuccess) {
-            // 更新成功
             request.getRequestDispatcher("subject_update_done.jsp").forward(request, response);
         } else {
-            // 更新失敗
             List<String> errors = new ArrayList<>();
             errors.add("科目の更新に失敗しました。");
             request.setAttribute("errors", errors);

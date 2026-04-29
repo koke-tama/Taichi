@@ -1,3 +1,4 @@
+/** 河合太一 */
 package scoremanager.main;
 
 import java.util.List;
@@ -10,53 +11,59 @@ import jakarta.servlet.http.HttpServletResponse;
 import tool.Action;
 
 public class StudentUpdateAction extends Action {
+
+    /**
+     * 学生情報の更新処理を行う
+     * 初期表示時は対象学生データとクラス一覧を取得して画面表示、
+     * 更新時は入力された内容でデータベースを更新する
+     */
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        // DAOの初期化
+
+        // DAO初期化
         StudentDao sDao = new StudentDao();
         ClassNumDao cDao = new ClassNumDao();
 
-        // リクエストパラメータの取得
+        // パラメータ取得
         String entYearStr = request.getParameter("ent_year");
-        String no = request.getParameter("no"); // 学生番号
+        String no = request.getParameter("no");
         String name = request.getParameter("name");
         String classNum = request.getParameter("class_num");
         String isAttendStr = request.getParameter("is_attend");
 
-        // 判別フラグ（jsllllllllllllllllklp側で「更新ボタン」を押したときにパラメータを送るようにします）
+        // 送信判定（更新ボタン押下時のみ値が入る想定）
         String submit = request.getParameter("submit");
 
         if (submit == null) {
-            // --- 初期表示処理 (GET相当) ---
-            // 学生番号から現在のデータを取得
+
+            // --- 初期表示処理 ---
             Student student = sDao.get(no);
-            // クラス一覧を取得（ドロップダウン用）
+
+            // クラス一覧取得（プルダウン用）
             List<String> classNumSet = cDao.filter(student.getSchool());
 
-
-            // リクエスト属性にセット
+            // リクエストにセット
             request.setAttribute("student", student);
             request.setAttribute("class_list", classNumSet);
-            
-            // 編集画面へフォワード
+
+            // 編集画面へ遷移
             request.getRequestDispatcher("update.jsp").forward(request, response);
 
         } else {
-            // --- 更新実行処理 (POST相当) ---
+
+            // --- 更新処理 ---
             Student student = new Student();
             student.setNo(no);
             student.setName(name);
             student.setEntYear(Integer.parseInt(entYearStr));
             student.setClassNum(classNum);
-            // 在学フラグの処理
             student.setAttend(isAttendStr != null);
 
-            // データベース更新
+            // DB更新
             sDao.save(student);
 
-            // 更新完了後は一覧画面へリダイレクト（またはフォワード）
+            // 更新後画面へ遷移
             request.getRequestDispatcher("update.jsp").forward(request, response);
-            
         }
     }
 }

@@ -1,3 +1,4 @@
+/**長家優紀*/
 package bean;
 
 import java.io.Serializable;

@@ -1,3 +1,4 @@
+/**高野翔*/
 package bean;
 import java.io.Serializable;
 public class Student implements Serializable {

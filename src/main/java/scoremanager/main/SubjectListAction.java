@@ -1,3 +1,4 @@
+/** 河合太一 */
 package scoremanager.main;
 
 import java.util.List;
@@ -12,20 +13,29 @@ import tool.Action;
 
 public class SubjectListAction extends Action {
 
+    /**
+     * ログインユーザーの所属学校に紐づく科目一覧を取得し、画面に表示する
+     */
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        // セッションからユーザー取得
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
 
         if (user != null) {
+
+            // DAO初期化
             SubjectDao sDao = new SubjectDao();
-            // ユーザーの所属学校を引数に渡す
+
+            // 科目一覧取得
             List<Subject> list = sDao.filter(user.getSchool());
-            
-            // JSPに渡す
+
+            // JSPへ渡す
             request.setAttribute("subjects", list);
         }
 
+        // 一覧画面へフォワード
         request.getRequestDispatcher("subject_list.jsp").forward(request, response);
     }
 }

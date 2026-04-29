@@ -1,3 +1,4 @@
+/*小野田匠希*/
 package tool;
 
 import java.io.IOException;
@@ -11,6 +12,9 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet("*.action")
 public class FrontController extends HttpServlet {
 
+    /**
+     * リクエストURLからActionクラスを特定して実行する
+     */
     @Override
     protected void doGet(
             HttpServletRequest request,
@@ -18,35 +22,35 @@ public class FrontController extends HttpServlet {
     ) throws ServletException, IOException {
 
         try {
-            // パスの取得とクラス名への変換
+            // URLからクラス名を生成
             String path = request.getServletPath().substring(1);
             String name = path.replace(".a", "A")
-                            .replace('/', '.');
+                              .replace('/', '.');
 
             System.out.println("★ servlet path -> " + request.getServletPath());
             System.out.println("★ class name -> " + name);
 
-            // Actionクラスのインスタンス生成
+            // Actionクラス生成
             Action action = (Action) Class.forName(name)
                     .getDeclaredConstructor()
                     .newInstance();
 
-            // execute実行
+            // 処理実行
             action.execute(request, response);
 
         } catch (Exception e) {
-            // ログにスタックトレースを出力（サーバー側で確認用）
             e.printStackTrace();
 
-            // JSPでエラー内容を表示したい場合はリクエスト属性にセット
             request.setAttribute("exception", e);
 
-            // ★ エラーページへ遷移
-            // パスはプロジェクトの構造に合わせて調整してください（例: "/scoremanager/main/error.jsp"）
+            // エラーページへ遷移
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
 
+    /**
+     * POSTリクエストをGETに委譲する
+     */
     @Override
     protected void doPost(
             HttpServletRequest request,

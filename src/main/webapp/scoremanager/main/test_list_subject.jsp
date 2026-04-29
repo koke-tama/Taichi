@@ -1,3 +1,4 @@
+<%-- 河合太一 --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
  
@@ -11,108 +12,63 @@
                 成績一覧（科目）
             </h2>
  
-            <!-- ========================= -->
-            <!-- 入力エリア -->
-            <!-- ========================= -->
-            <div class="bg-white p-3 rounded border mb-3">
- 
- 
-                <!-- 上：科目検索 -->
-                <form action="TestListSubjectExecute.action" method="get">
- 
-                    <div class="row align-items-end">
- 
-                        <!-- 科目情報ラベル -->
-                        <div class="col-md-2 mb-3 fw-bold text-secondary">
-                            科目情報
-                        </div>
- 
-                        <!-- 入学年度 -->
-                        <div class="col-md-2 mb-3">
-                            <label class="form-label">入学年度</label>
-                            <select name="f1" class="form-select" required>
-                                <option value="">--------</option>
-                                <c:forEach var="year" items="${ent_year_set}">
-                                    <option value="${year}" <c:if test="${year == f1}">selected</c:if>>
-                                        ${year}
-                                    </option>
-                                </c:forEach>
-                            </select>
-                        </div>
- 
-                        <!-- クラス -->
-                        <div class="col-md-2 mb-3">
-                            <label class="form-label">クラス</label>
-                            <select name="f2" class="form-select" required>
-                                <option value="">--------</option>
-                                <c:forEach var="classNum" items="${class_num_set}">
-                                    <option value="${classNum}" <c:if test="${classNum == f2}">selected</c:if>>
-                                        ${classNum}
-                                    </option>
-                                </c:forEach>
-                            </select>
-                        </div>
- 
-                        <!-- 科目 -->
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label">科目</label>
-                            <select name="f3" class="form-select" required>
-                                <option value="">--------</option>
-                                <c:forEach var="sub" items="${subjects}">
-                                    <option value="${sub.cd}" <c:if test="${sub.cd == f3}">selected</c:if>>
-                                        ${sub.name}
-                                    </option>
-                                </c:forEach>
-                            </select>
-                        </div>
- 
-                        <!-- ボタン -->
-                        <div class="col-md-3 mb-3 text-center">
-                            <button type="submit" class="btn btn-secondary">
-                                検索
-                            </button>
-                        </div>
- 
-                    </div>
- 
-                </form>
- 
-                <hr>
- 
-                <!-- 下：学生検索 -->
-                <form action="TestListSubjectExecute.action" method="get">
- 
+            <!-- 検索フォームエリア -->
+            <div class="card p-4 mb-4">
+                <!-- 科目情報検索（画像上段） -->
+                <form action="TestListSubjectExecute.action" method="get" class="mb-4">
                     <div class="row align-items-center">
- 
-                        <!-- 学生情報ラベル -->
-                        <div class="col-md-2 mb-2 fw-bold text-secondary">
-                            学生情報
+                        <div class="col-md-2">科目情報</div>
+                        <div class="col-md-2">
+                            <label class="small">入学年度</label>
+                            <select name="f1" class="form-select form-select-sm">
+                                <option value="">--------</option>
+                                <c:forEach var="y" items="${ent_year_set}">
+                                    <option value="${y}">${y}</option>
+                                </c:forEach>
+                            </select>
                         </div>
- 
-                        <!-- 学生番号 -->
-                        <div class="col-md-7 mb-2">
-                            <label class="form-label">学生番号</label>
-                            <input type="text" name="studentNo" class="form-control"
-                                   placeholder="学生番号を入力してください">
+                        <div class="col-md-2">
+                            <label class="small">クラス</label>
+                            <select name="f2" class="form-select form-select-sm">
+                                <option value="">--------</option>
+                                <c:forEach var="c" items="${class_num_set}">
+                                    <option value="${c}">${c}</option>
+                                </c:forEach>
+                            </select>
                         </div>
- 
-                        <!-- ボタン -->
-                        <div class="col-md-3 mb-2 text-center">
-                            <button type="submit" class="btn btn-secondary">
-                                検索
-                            </button>
+                        <div class="col-md-4">
+                            <label class="small">科目</label>
+                            <select name="f3" class="form-select form-select-sm">
+                                <option value="">--------</option>
+                                <c:forEach var="s" items="${subjects}">
+                                    <option value="${s.cd}">${s.name}</option>
+                                </c:forEach>
+                            </select>
                         </div>
- 
+                        <div class="col-md-2 text-end">
+                            <button type="submit" class="btn btn-secondary btn-sm px-4">検索</button>
+                        </div>
                     </div>
- 
                 </form>
- 
+
+                <hr>
+
+                <!-- 学生情報検索（画像中段） -->
+                <form action="TestListStudentExecute.action" method="get">
+                    <div class="row align-items-center">
+                        <div class="col-md-2">学生情報</div>
+                        <div class="col-md-8">
+                            <label class="small">学生番号</label>
+                            <input type="text" name="f4" value="${f4}" class="form-control form-control-sm w-50" placeholder="1111111">
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <button type="submit" class="btn btn-secondary btn-sm px-4">検索</button>
+                        </div>
+                    </div>
+                </form>
             </div>
  
  
-            <!-- ========================= -->
-            <!-- 結果 -->
-            <!-- ========================= -->
             <c:choose>
  
                 <c:when test="${not empty scoreMap}">

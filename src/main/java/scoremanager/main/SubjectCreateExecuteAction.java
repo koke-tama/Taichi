@@ -1,3 +1,4 @@
+/** 河合太一 */
 package scoremanager.main;
 
 import java.util.ArrayList;
@@ -13,36 +14,44 @@ import tool.Action;
 
 public class SubjectCreateExecuteAction extends Action {
 
+    /**
+     * 科目登録処理を実行する
+     * 入力値のバリデーションと重複チェックを行い、問題なければDBに保存する
+     */
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        // 1. セッションからユーザー情報を取得
+
+        // セッションからユーザー取得
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
 
-        // 2. リクエストパラメータ（入力値）の取得
+        // ログインチェック
+        if (user == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+
+        // パラメータ取得
         String cd = request.getParameter("cd");
         String name = request.getParameter("name");
 
-        // 3. バリデーションの準備
+        // バリデーション準備
         List<String> errors = new ArrayList<>();
         SubjectDao sDao = new SubjectDao();
 
-        // 【要件】科目コードは3文字で入力してください
+        // 科目コードチェック（3文字）
         if (cd == null || cd.length() != 3) {
             errors.add("科目コードは3文字で入力してください");
         } else {
-            // 【要件】詳細データを取得（重複チェック）
-            // 既に同じコードの科目が存在するか確認
+            // 重複チェック
             Subject existingSubject = sDao.get(cd, user.getSchool());
             if (existingSubject != null) {
-                // 【要件】科目コードが重複しています
                 errors.add("科目コードが重複しています");
             }
         }
 
-        // 4. エラーがある場合の処理
+        // エラー時処理
         if (!errors.isEmpty()) {
-            // 入力値を保持して登録画面に戻る
             request.setAttribute("errors", errors);
             request.setAttribute("cd", cd);
             request.setAttribute("name", name);
@@ -50,16 +59,16 @@ public class SubjectCreateExecuteAction extends Action {
             return;
         }
 
-        // 5. DBに科目を保存（エラーがない場合）
+        // 科目生成
         Subject subject = new Subject();
         subject.setCd(cd);
         subject.setName(name);
         subject.setSchool(user.getSchool());
 
-        // 保存実行
+        // DB保存
         sDao.save(subject);
 
-        // 6. 登録完了画面を表示
+        // 完了画面へ遷移
         request.getRequestDispatcher("subject_create_done.jsp").forward(request, response);
     }
 }

@@ -1,3 +1,4 @@
+/*河合太一*/
 package dao;
 
 import java.sql.Connection;
@@ -13,13 +14,14 @@ import bean.Test;
 public class TestListStudentDao extends Dao {
 
     /**
-     * 特定の学生の全成績データを取得します。
-     * 科目名を表示するために subject テーブルと結合します。
+     * 学生別の成績一覧を取得する
+     * @param student 学生
+     * @return 成績リスト
+     * @throws Exception
      */
     public List<Test> filter(Student student) throws Exception {
         List<Test> list = new ArrayList<>();
 
-        // SQL: 成績データと科目名を結合して取得
         String sql = """
             SELECT 
                 t.subject_cd, 
@@ -44,7 +46,6 @@ public class TestListStudentDao extends Dao {
                     Test test = new Test();
                     test.setStudent(student);
 
-                    // 科目Beanを生成してセット
                     Subject subject = new Subject();
                     subject.setCd(rs.getString("subject_cd"));
                     subject.setName(rs.getString("subject_name"));
@@ -56,10 +57,7 @@ public class TestListStudentDao extends Dao {
                     list.add(test);
                 }
             }
-        } catch (Exception e) {
-            throw e;
         }
-
         return list;
     }
 }

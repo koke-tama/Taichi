@@ -1,51 +1,67 @@
+<%-- 長家優紀 --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+ 
 <c:import url="/common/base.jsp">
-    <c:param name="title">科目管理</c:param>
+    <c:param name="title">科目情報登録</c:param>
     
     <c:param name="content">
-        <div class="header" style="background-color: #f0f0f0; padding: 10px; font-weight: bold; width: 600px;">
-            科目登録
-        </div>
+        <section class="me-4">
 
-        <%-- エラーメッセージの表示エリア（重複エラーや3文字エラーなど） --%>
-        <c:if test="${not empty errors}">
-            <div style="color: red; margin: 10px 0;">
-                <c:forEach var="error" items="${errors}">
-                    <p style="margin: 0;">${error}</p>
-                </c:forEach>
+            <%-- 見出し --%>
+            <h2 class="h4 mb-4 bg-light p-2" style="font-weight: bold;">
+                科目情報登録
+            </h2>
+     
+            <%-- エラーメッセージ --%>
+            <c:if test="${not empty errors}">
+                <div class="alert alert-danger p-2 mb-3" style="font-size: 0.9rem;">
+                    <c:forEach var="error" items="${errors}">
+                        <p class="mb-0">${error}</p>
+                    </c:forEach>
+                </div>
+            </c:if>
+     
+            <%-- 登録フォーム --%>
+            <form action="SubjectCreateExecute.action" method="post" class="ms-2">
+                
+                <%-- 科目コード --%>
+                <div class="mb-3">
+                    <label class="form-label d-block mb-1" style="font-weight: bold;">科目コード</label>
+                    <input type="text" name="cd" value="${cd}"
+                           class="form-control"
+                           placeholder="科目コードを入力してください"
+                           required
+                           style="width: 100%; max-width: 500px; background-color: #fff !important;">
+                </div>
+     
+                <%-- 科目名 --%>
+                <div class="mb-3">
+                    <label class="form-label d-block mb-1" style="font-weight: bold;">科目名</label>
+                    <input type="text" name="name" value="${name}"
+                           class="form-control"
+                           placeholder="科目名を入力してください"
+                           required
+                           style="width: 100%; max-width: 500px; background-color: #fff !important;">
+                </div>
+     
+                <%-- 登録ボタン --%>
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary px-4" style="font-size: 0.9rem;">
+                        登録
+                    </button>
+                </div>
+            </form>
+     
+            <%-- 戻るリンク --%>
+            <div class="mt-3 ms-2">
+                <a href="SubjectList.action"
+                   class="text-primary"
+                   style="text-decoration: underline; font-size: 0.9rem;">
+                    戻る
+                </a>
             </div>
-        </c:if>
 
-        <%-- 登録フォーム：送信先は SubjectCreateExecute.action --%>
-        <form action="SubjectCreateExecute.action" method="post" style="margin-top: 20px;">
-            <div style="margin-bottom: 15px;">
-                <label style="display: inline-block; width: 100px;">科目コード</label>
-                <%-- required: 未入力時に「このフィールドを入力してください」を表示 --%>
-                <%-- value: エラーで戻ってきたときに入力内容を保持 --%>
-                <input type="text" name="cd" value="${cd}" 
-                       required 
-                       placeholder="例：A01"
-                       style="padding: 3px;">
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <label style="display: inline-block; width: 100px;">科目名</label>
-                <input type="text" name="name" value="${name}" 
-                       required 
-                       placeholder="例：数学"
-                       style="padding: 3px;">
-            </div>
-
-            <div style="margin-top: 20px;">
-                <button type="submit" style="padding: 5px 15px;">登録</button>
-            </div>
-        </form>
-
-        <%-- 戻るボタン：メニューと同じ処理（ListAction）を経由させる --%>
-        <div style="margin-top: 20px;">
-            <a href="SubjectList.action" style="color: blue; text-decoration: underline;">戻る</a>
-        </div>
+        </section>
     </c:param>
 </c:import>

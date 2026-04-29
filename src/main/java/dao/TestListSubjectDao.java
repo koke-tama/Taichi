@@ -1,3 +1,4 @@
+/*河合太一*/
 package dao;
 
 import java.sql.Connection;
@@ -13,13 +14,17 @@ import bean.TestListSubject;
 public class TestListSubjectDao extends Dao {
 
     /**
-     * 指定された条件に合致する成績一覧を取得する
+     * 科目・クラス別の成績一覧を取得する
+     * @param entYear 入学年度
+     * @param classNum クラス番号
+     * @param subject 科目
+     * @param school 学校
+     * @return 成績一覧
+     * @throws Exception
      */
     public List<TestListSubject> filter(int entYear, String classNum, Subject subject, School school) throws Exception {
         List<TestListSubject> list = new ArrayList<>();
         
-        // 学生(student)と成績(test)を結合して取得
-        // 成績がない場合も考慮して、要件に応じて INNER JOIN か LEFT JOIN を使い分けます
         String sql = """
             SELECT 
                 s.ent_year, s.no AS student_no, s.name AS student_name, 
@@ -54,10 +59,7 @@ public class TestListSubjectDao extends Dao {
                     list.add(res);
                 }
             }
-        } catch (Exception e) {
-            throw e;
         }
-
         return list;
     }
 }

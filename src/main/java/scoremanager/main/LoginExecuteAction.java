@@ -1,3 +1,4 @@
+/*長家優紀*/
 package scoremanager.main;
  
 import bean.Teacher;
@@ -9,6 +10,9 @@ import tool.Action;
  
 public class LoginExecuteAction extends Action {
  
+    /**
+     * ログイン認証を行う
+     */
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
  
@@ -25,12 +29,10 @@ public class LoginExecuteAction extends Action {
         }
  
         TeacherDao dao = new TeacherDao();
+        Teacher teacher = dao.get(id);
  
-        Teacher teacher = dao.get(id);  // IDで1件取得
- 
-        // 存在しない or パスワード違い
+        // 認証チェック
         if (teacher == null || !teacher.getPassword().equals(password)) {
-            // 画像の表記に合わせてメッセージを変更
             request.setAttribute("error", "ログインに失敗しました。IDまたはパスワードが正しくありません。");
             request.setAttribute("id", id);
             request.getRequestDispatcher("login.jsp").forward(request, response);
@@ -44,4 +46,3 @@ public class LoginExecuteAction extends Action {
         response.sendRedirect("menu.jsp");
     }
 }
- 
